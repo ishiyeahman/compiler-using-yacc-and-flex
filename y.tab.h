@@ -46,8 +46,12 @@
      MIN = 262,
      FACTORIAL = 263,
      PI = 264,
-     INTC = 265,
-     REALC = 266
+     E = 265,
+     ABS = 266,
+     DEGREE = 267,
+     INTC = 268,
+     REALC = 269,
+     UMINUS = 270
    };
 #endif
 /* Tokens.  */
@@ -58,21 +62,25 @@
 #define MIN 262
 #define FACTORIAL 263
 #define PI 264
-#define INTC 265
-#define REALC 266
+#define E 265
+#define ABS 266
+#define DEGREE 267
+#define INTC 268
+#define REALC 269
+#define UMINUS 270
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 17 "calc2.y"
+#line 19 "calc2.y"
 {
     int ival;
     double rval;
 }
 /* Line 1529 of yacc.c.  */
-#line 76 "y.tab.h"
+#line 84 "y.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
