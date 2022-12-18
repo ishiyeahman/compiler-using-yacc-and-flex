@@ -42,16 +42,24 @@
      EXP = 258,
      LOG = 259,
      SQRT = 260,
-     INTC = 261,
-     REALC = 262
+     MAX = 261,
+     MIN = 262,
+     FACTORIAL = 263,
+     PI = 264,
+     INTC = 265,
+     REALC = 266
    };
 #endif
 /* Tokens.  */
 #define EXP 258
 #define LOG 259
 #define SQRT 260
-#define INTC 261
-#define REALC 262
+#define MAX 261
+#define MIN 262
+#define FACTORIAL 263
+#define PI 264
+#define INTC 265
+#define REALC 266
 
 
 
@@ -64,7 +72,7 @@ typedef union YYSTYPE
     double rval;
 }
 /* Line 1529 of yacc.c.  */
-#line 68 "y.tab.h"
+#line 76 "y.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

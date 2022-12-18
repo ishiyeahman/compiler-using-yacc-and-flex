@@ -19,45 +19,54 @@ void exit(int);
     double rval;
 }
 
-%token EXP LOG SQRT
+%token EXP LOG SQRT MAX MIN FACTORIAL PI
 
 %token <ival> INTC
 %token <rval> REALC
 
-%type  <rval> line expr term factor
+%type  <rval> line expr 
 
-%start line 
-
+%right '='
+%left '+' '-'
+%left '*' '/' '%'
+%right '^'
+/* %start line  */
 %%
 
-line    :   expr '\n'   {
-                        printf("ans >> %lf\n", $1); 
+/* main    : main line
+        | line
+        ; */
+
+        
+line    :
+        |  line expr '\n'   {
+                        printf("ans >> %f\n", $2); 
                         /* 再帰的に計算 */
                         /* syntax errorならば再帰を復帰せずその処理で終了*/
-                        if( yyparse()) exit(1); 
+                        // if( yyparse()) exit(1); 
                         }
+        | line error '\n' { yyerrok; }
         ;
 
-expr    :   expr '+' term       { $$ = $1 + $3; }
-        |   expr '-' term       { $$ = $1 - $3; }
-        |   term                { $$ = $1; }
-        ;
-
-term    :   term '*' factor     { $$ = $1 * $3; } 
-        |   term '/' factor     { if($3 == 0) { 
-                                        /*計算を行わず0を出力する*/
-                                        printf("division by zero\n"); 
-                                        $$ = 0;  
+expr    :   expr '+' expr       { $$ = $1 + $3; }
+        |   expr '-' expr       { $$ = $1 - $3; }
+        |   expr '*' expr     { $$ = $1 * $3; } 
+        |   expr '/' expr     { if($3 == 0) { 
+                                    /*計算を行わず0を出力する*/
+                                    printf("division by zero\n"); 
+                                    $$ = 0;  
                                 } else { $$ = $1 / $3;} }
         /* 剰余演算子を追加 */
-        |   term '%' factor     { $$ =fmod($1,$3); } 
-
-        /* べき乗を追加*/
-        |   term '^' factor     { $$ = pow($1, $3); } 
-        |   factor              { $$ = $1; }
-        ;
-
-factor  :   '(' expr ')'        {$$ = $2;}
+        |   expr '%' expr    { $$ =fmod($1,$3); } 
+        |   expr '^' expr     { $$ = pow($1, $3); } 
+        |  '(' expr ')'        {$$ = $2;}
+        | LOG '(' expr ')'      {$$ = log($3); }
+        | EXP '(' expr ')'      {$$ = exp($3); }
+        | SQRT '(' expr ')'      {$$ = sqrt($3); }
+        | MAX '(' expr ',' expr ')'      {$$ = fmax($3, $5); }
+        | MIN '(' expr ',' expr ')'      {$$ = fmin($3, $5); }
+        | '(' expr')' FACTORIAL   {$$ = tgamma($2 + 1.0); } /* FACTORIAL = gmmma(n + 1)*/
+        |   PI                  {$$ = M_PI; }
         |   INTC                {$$ = (double)$1; }
         |   REALC               {$$ = $1; }
         ;
@@ -76,5 +85,3 @@ int main(){
 void yyerror( char *msg){
     printf("%s\n", msg);
 }
-
-

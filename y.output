@@ -1,302 +1,739 @@
 Terminals which are not used
 
-   EXP
-   LOG
-   SQRT
+   '='
 
 
 Grammar
 
     0 $accept: line $end
 
-    1 line: expr '\n'
+    1 line: /* empty */
+    2     | line expr '\n'
+    3     | line error '\n'
 
-    2 expr: expr '+' term
-    3     | expr '-' term
-    4     | term
-
-    5 term: term '*' factor
-    6     | term '/' factor
-    7     | term '%' factor
-    8     | term '^' factor
-    9     | factor
-
-   10 factor: '(' expr ')'
-   11       | INTC
-   12       | REALC
+    4 expr: expr '+' expr
+    5     | expr '-' expr
+    6     | expr '*' expr
+    7     | expr '/' expr
+    8     | expr '%' expr
+    9     | expr '^' expr
+   10     | '(' expr ')'
+   11     | LOG '(' expr ')'
+   12     | EXP '(' expr ')'
+   13     | SQRT '(' expr ')'
+   14     | MAX '(' expr ',' expr ')'
+   15     | MIN '(' expr ',' expr ')'
+   16     | '(' expr ')' FACTORIAL
+   17     | PI
+   18     | INTC
+   19     | REALC
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-'\n' (10) 1
-'%' (37) 7
-'(' (40) 10
-')' (41) 10
-'*' (42) 5
-'+' (43) 2
-'-' (45) 3
-'/' (47) 6
-'^' (94) 8
-error (256)
-EXP (258)
-LOG (259)
-SQRT (260)
-INTC (261) 11
-REALC (262) 12
+'\n' (10) 2 3
+'%' (37) 8
+'(' (40) 10 11 12 13 14 15 16
+')' (41) 10 11 12 13 14 15 16
+'*' (42) 6
+'+' (43) 4
+',' (44) 14 15
+'-' (45) 5
+'/' (47) 7
+'=' (61)
+'^' (94) 9
+error (256) 3
+EXP (258) 12
+LOG (259) 11
+SQRT (260) 13
+MAX (261) 14
+MIN (262) 15
+FACTORIAL (263) 16
+PI (264) 17
+INTC (265) 18
+REALC (266) 19
 
 
 Nonterminals, with rules where they appear
 
-$accept (17)
+$accept (23)
     on left: 0
-line (18)
-    on left: 1, on right: 0
-expr (19)
-    on left: 2 3 4, on right: 1 2 3 10
-term (20)
-    on left: 5 6 7 8 9, on right: 2 3 4 5 6 7 8
-factor (21)
-    on left: 10 11 12, on right: 5 6 7 8 9
+line (24)
+    on left: 1 2 3, on right: 0 2 3
+expr (25)
+    on left: 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19,
+    on right: 2 4 5 6 7 8 9 10 11 12 13 14 15 16
 
 
 state 0
 
     0 $accept: . line $end
 
-    INTC   shift, and go to state 1
-    REALC  shift, and go to state 2
-    '('    shift, and go to state 3
+    $default  reduce using rule 1 (line)
 
-    line    go to state 4
-    expr    go to state 5
-    term    go to state 6
-    factor  go to state 7
+    line  go to state 1
 
 
 state 1
 
-   11 factor: INTC .
+    0 $accept: line . $end
+    2 line: line . expr '\n'
+    3     | line . error '\n'
 
-    $default  reduce using rule 11 (factor)
+    $end   shift, and go to state 2
+    error  shift, and go to state 3
+    EXP    shift, and go to state 4
+    LOG    shift, and go to state 5
+    SQRT   shift, and go to state 6
+    MAX    shift, and go to state 7
+    MIN    shift, and go to state 8
+    PI     shift, and go to state 9
+    INTC   shift, and go to state 10
+    REALC  shift, and go to state 11
+    '('    shift, and go to state 12
+
+    expr  go to state 13
 
 
 state 2
-
-   12 factor: REALC .
-
-    $default  reduce using rule 12 (factor)
-
-
-state 3
-
-   10 factor: '(' . expr ')'
-
-    INTC   shift, and go to state 1
-    REALC  shift, and go to state 2
-    '('    shift, and go to state 3
-
-    expr    go to state 8
-    term    go to state 6
-    factor  go to state 7
-
-
-state 4
-
-    0 $accept: line . $end
-
-    $end  shift, and go to state 9
-
-
-state 5
-
-    1 line: expr . '\n'
-    2 expr: expr . '+' term
-    3     | expr . '-' term
-
-    '\n'  shift, and go to state 10
-    '+'   shift, and go to state 11
-    '-'   shift, and go to state 12
-
-
-state 6
-
-    4 expr: term .
-    5 term: term . '*' factor
-    6     | term . '/' factor
-    7     | term . '%' factor
-    8     | term . '^' factor
-
-    '*'  shift, and go to state 13
-    '/'  shift, and go to state 14
-    '%'  shift, and go to state 15
-    '^'  shift, and go to state 16
-
-    $default  reduce using rule 4 (expr)
-
-
-state 7
-
-    9 term: factor .
-
-    $default  reduce using rule 9 (term)
-
-
-state 8
-
-    2 expr: expr . '+' term
-    3     | expr . '-' term
-   10 factor: '(' expr . ')'
-
-    '+'  shift, and go to state 11
-    '-'  shift, and go to state 12
-    ')'  shift, and go to state 17
-
-
-state 9
 
     0 $accept: line $end .
 
     $default  accept
 
 
+state 3
+
+    3 line: line error . '\n'
+
+    '\n'  shift, and go to state 14
+
+
+state 4
+
+   12 expr: EXP . '(' expr ')'
+
+    '('  shift, and go to state 15
+
+
+state 5
+
+   11 expr: LOG . '(' expr ')'
+
+    '('  shift, and go to state 16
+
+
+state 6
+
+   13 expr: SQRT . '(' expr ')'
+
+    '('  shift, and go to state 17
+
+
+state 7
+
+   14 expr: MAX . '(' expr ',' expr ')'
+
+    '('  shift, and go to state 18
+
+
+state 8
+
+   15 expr: MIN . '(' expr ',' expr ')'
+
+    '('  shift, and go to state 19
+
+
+state 9
+
+   17 expr: PI .
+
+    $default  reduce using rule 17 (expr)
+
+
 state 10
 
-    1 line: expr '\n' .
+   18 expr: INTC .
 
-    $default  reduce using rule 1 (line)
+    $default  reduce using rule 18 (expr)
 
 
 state 11
 
-    2 expr: expr '+' . term
+   19 expr: REALC .
 
-    INTC   shift, and go to state 1
-    REALC  shift, and go to state 2
-    '('    shift, and go to state 3
-
-    term    go to state 18
-    factor  go to state 7
+    $default  reduce using rule 19 (expr)
 
 
 state 12
 
-    3 expr: expr '-' . term
+   10 expr: '(' . expr ')'
+   16     | '(' . expr ')' FACTORIAL
 
-    INTC   shift, and go to state 1
-    REALC  shift, and go to state 2
-    '('    shift, and go to state 3
+    EXP    shift, and go to state 4
+    LOG    shift, and go to state 5
+    SQRT   shift, and go to state 6
+    MAX    shift, and go to state 7
+    MIN    shift, and go to state 8
+    PI     shift, and go to state 9
+    INTC   shift, and go to state 10
+    REALC  shift, and go to state 11
+    '('    shift, and go to state 12
 
-    term    go to state 19
-    factor  go to state 7
+    expr  go to state 20
 
 
 state 13
 
-    5 term: term '*' . factor
+    2 line: line expr . '\n'
+    4 expr: expr . '+' expr
+    5     | expr . '-' expr
+    6     | expr . '*' expr
+    7     | expr . '/' expr
+    8     | expr . '%' expr
+    9     | expr . '^' expr
 
-    INTC   shift, and go to state 1
-    REALC  shift, and go to state 2
-    '('    shift, and go to state 3
-
-    factor  go to state 20
+    '+'   shift, and go to state 21
+    '-'   shift, and go to state 22
+    '*'   shift, and go to state 23
+    '/'   shift, and go to state 24
+    '%'   shift, and go to state 25
+    '^'   shift, and go to state 26
+    '\n'  shift, and go to state 27
 
 
 state 14
 
-    6 term: term '/' . factor
+    3 line: line error '\n' .
 
-    INTC   shift, and go to state 1
-    REALC  shift, and go to state 2
-    '('    shift, and go to state 3
-
-    factor  go to state 21
+    $default  reduce using rule 3 (line)
 
 
 state 15
 
-    7 term: term '%' . factor
+   12 expr: EXP '(' . expr ')'
 
-    INTC   shift, and go to state 1
-    REALC  shift, and go to state 2
-    '('    shift, and go to state 3
+    EXP    shift, and go to state 4
+    LOG    shift, and go to state 5
+    SQRT   shift, and go to state 6
+    MAX    shift, and go to state 7
+    MIN    shift, and go to state 8
+    PI     shift, and go to state 9
+    INTC   shift, and go to state 10
+    REALC  shift, and go to state 11
+    '('    shift, and go to state 12
 
-    factor  go to state 22
+    expr  go to state 28
 
 
 state 16
 
-    8 term: term '^' . factor
+   11 expr: LOG '(' . expr ')'
 
-    INTC   shift, and go to state 1
-    REALC  shift, and go to state 2
-    '('    shift, and go to state 3
+    EXP    shift, and go to state 4
+    LOG    shift, and go to state 5
+    SQRT   shift, and go to state 6
+    MAX    shift, and go to state 7
+    MIN    shift, and go to state 8
+    PI     shift, and go to state 9
+    INTC   shift, and go to state 10
+    REALC  shift, and go to state 11
+    '('    shift, and go to state 12
 
-    factor  go to state 23
+    expr  go to state 29
 
 
 state 17
 
-   10 factor: '(' expr ')' .
+   13 expr: SQRT '(' . expr ')'
 
-    $default  reduce using rule 10 (factor)
+    EXP    shift, and go to state 4
+    LOG    shift, and go to state 5
+    SQRT   shift, and go to state 6
+    MAX    shift, and go to state 7
+    MIN    shift, and go to state 8
+    PI     shift, and go to state 9
+    INTC   shift, and go to state 10
+    REALC  shift, and go to state 11
+    '('    shift, and go to state 12
+
+    expr  go to state 30
 
 
 state 18
 
-    2 expr: expr '+' term .
-    5 term: term . '*' factor
-    6     | term . '/' factor
-    7     | term . '%' factor
-    8     | term . '^' factor
+   14 expr: MAX '(' . expr ',' expr ')'
 
-    '*'  shift, and go to state 13
-    '/'  shift, and go to state 14
-    '%'  shift, and go to state 15
-    '^'  shift, and go to state 16
+    EXP    shift, and go to state 4
+    LOG    shift, and go to state 5
+    SQRT   shift, and go to state 6
+    MAX    shift, and go to state 7
+    MIN    shift, and go to state 8
+    PI     shift, and go to state 9
+    INTC   shift, and go to state 10
+    REALC  shift, and go to state 11
+    '('    shift, and go to state 12
 
-    $default  reduce using rule 2 (expr)
+    expr  go to state 31
 
 
 state 19
 
-    3 expr: expr '-' term .
-    5 term: term . '*' factor
-    6     | term . '/' factor
-    7     | term . '%' factor
-    8     | term . '^' factor
+   15 expr: MIN '(' . expr ',' expr ')'
 
-    '*'  shift, and go to state 13
-    '/'  shift, and go to state 14
-    '%'  shift, and go to state 15
-    '^'  shift, and go to state 16
+    EXP    shift, and go to state 4
+    LOG    shift, and go to state 5
+    SQRT   shift, and go to state 6
+    MAX    shift, and go to state 7
+    MIN    shift, and go to state 8
+    PI     shift, and go to state 9
+    INTC   shift, and go to state 10
+    REALC  shift, and go to state 11
+    '('    shift, and go to state 12
 
-    $default  reduce using rule 3 (expr)
+    expr  go to state 32
 
 
 state 20
 
-    5 term: term '*' factor .
+    4 expr: expr . '+' expr
+    5     | expr . '-' expr
+    6     | expr . '*' expr
+    7     | expr . '/' expr
+    8     | expr . '%' expr
+    9     | expr . '^' expr
+   10     | '(' expr . ')'
+   16     | '(' expr . ')' FACTORIAL
 
-    $default  reduce using rule 5 (term)
+    '+'  shift, and go to state 21
+    '-'  shift, and go to state 22
+    '*'  shift, and go to state 23
+    '/'  shift, and go to state 24
+    '%'  shift, and go to state 25
+    '^'  shift, and go to state 26
+    ')'  shift, and go to state 33
 
 
 state 21
 
-    6 term: term '/' factor .
+    4 expr: expr '+' . expr
 
-    $default  reduce using rule 6 (term)
+    EXP    shift, and go to state 4
+    LOG    shift, and go to state 5
+    SQRT   shift, and go to state 6
+    MAX    shift, and go to state 7
+    MIN    shift, and go to state 8
+    PI     shift, and go to state 9
+    INTC   shift, and go to state 10
+    REALC  shift, and go to state 11
+    '('    shift, and go to state 12
+
+    expr  go to state 34
 
 
 state 22
 
-    7 term: term '%' factor .
+    5 expr: expr '-' . expr
 
-    $default  reduce using rule 7 (term)
+    EXP    shift, and go to state 4
+    LOG    shift, and go to state 5
+    SQRT   shift, and go to state 6
+    MAX    shift, and go to state 7
+    MIN    shift, and go to state 8
+    PI     shift, and go to state 9
+    INTC   shift, and go to state 10
+    REALC  shift, and go to state 11
+    '('    shift, and go to state 12
+
+    expr  go to state 35
 
 
 state 23
 
-    8 term: term '^' factor .
+    6 expr: expr '*' . expr
 
-    $default  reduce using rule 8 (term)
+    EXP    shift, and go to state 4
+    LOG    shift, and go to state 5
+    SQRT   shift, and go to state 6
+    MAX    shift, and go to state 7
+    MIN    shift, and go to state 8
+    PI     shift, and go to state 9
+    INTC   shift, and go to state 10
+    REALC  shift, and go to state 11
+    '('    shift, and go to state 12
+
+    expr  go to state 36
+
+
+state 24
+
+    7 expr: expr '/' . expr
+
+    EXP    shift, and go to state 4
+    LOG    shift, and go to state 5
+    SQRT   shift, and go to state 6
+    MAX    shift, and go to state 7
+    MIN    shift, and go to state 8
+    PI     shift, and go to state 9
+    INTC   shift, and go to state 10
+    REALC  shift, and go to state 11
+    '('    shift, and go to state 12
+
+    expr  go to state 37
+
+
+state 25
+
+    8 expr: expr '%' . expr
+
+    EXP    shift, and go to state 4
+    LOG    shift, and go to state 5
+    SQRT   shift, and go to state 6
+    MAX    shift, and go to state 7
+    MIN    shift, and go to state 8
+    PI     shift, and go to state 9
+    INTC   shift, and go to state 10
+    REALC  shift, and go to state 11
+    '('    shift, and go to state 12
+
+    expr  go to state 38
+
+
+state 26
+
+    9 expr: expr '^' . expr
+
+    EXP    shift, and go to state 4
+    LOG    shift, and go to state 5
+    SQRT   shift, and go to state 6
+    MAX    shift, and go to state 7
+    MIN    shift, and go to state 8
+    PI     shift, and go to state 9
+    INTC   shift, and go to state 10
+    REALC  shift, and go to state 11
+    '('    shift, and go to state 12
+
+    expr  go to state 39
+
+
+state 27
+
+    2 line: line expr '\n' .
+
+    $default  reduce using rule 2 (line)
+
+
+state 28
+
+    4 expr: expr . '+' expr
+    5     | expr . '-' expr
+    6     | expr . '*' expr
+    7     | expr . '/' expr
+    8     | expr . '%' expr
+    9     | expr . '^' expr
+   12     | EXP '(' expr . ')'
+
+    '+'  shift, and go to state 21
+    '-'  shift, and go to state 22
+    '*'  shift, and go to state 23
+    '/'  shift, and go to state 24
+    '%'  shift, and go to state 25
+    '^'  shift, and go to state 26
+    ')'  shift, and go to state 40
+
+
+state 29
+
+    4 expr: expr . '+' expr
+    5     | expr . '-' expr
+    6     | expr . '*' expr
+    7     | expr . '/' expr
+    8     | expr . '%' expr
+    9     | expr . '^' expr
+   11     | LOG '(' expr . ')'
+
+    '+'  shift, and go to state 21
+    '-'  shift, and go to state 22
+    '*'  shift, and go to state 23
+    '/'  shift, and go to state 24
+    '%'  shift, and go to state 25
+    '^'  shift, and go to state 26
+    ')'  shift, and go to state 41
+
+
+state 30
+
+    4 expr: expr . '+' expr
+    5     | expr . '-' expr
+    6     | expr . '*' expr
+    7     | expr . '/' expr
+    8     | expr . '%' expr
+    9     | expr . '^' expr
+   13     | SQRT '(' expr . ')'
+
+    '+'  shift, and go to state 21
+    '-'  shift, and go to state 22
+    '*'  shift, and go to state 23
+    '/'  shift, and go to state 24
+    '%'  shift, and go to state 25
+    '^'  shift, and go to state 26
+    ')'  shift, and go to state 42
+
+
+state 31
+
+    4 expr: expr . '+' expr
+    5     | expr . '-' expr
+    6     | expr . '*' expr
+    7     | expr . '/' expr
+    8     | expr . '%' expr
+    9     | expr . '^' expr
+   14     | MAX '(' expr . ',' expr ')'
+
+    '+'  shift, and go to state 21
+    '-'  shift, and go to state 22
+    '*'  shift, and go to state 23
+    '/'  shift, and go to state 24
+    '%'  shift, and go to state 25
+    '^'  shift, and go to state 26
+    ','  shift, and go to state 43
+
+
+state 32
+
+    4 expr: expr . '+' expr
+    5     | expr . '-' expr
+    6     | expr . '*' expr
+    7     | expr . '/' expr
+    8     | expr . '%' expr
+    9     | expr . '^' expr
+   15     | MIN '(' expr . ',' expr ')'
+
+    '+'  shift, and go to state 21
+    '-'  shift, and go to state 22
+    '*'  shift, and go to state 23
+    '/'  shift, and go to state 24
+    '%'  shift, and go to state 25
+    '^'  shift, and go to state 26
+    ','  shift, and go to state 44
+
+
+state 33
+
+   10 expr: '(' expr ')' .
+   16     | '(' expr ')' . FACTORIAL
+
+    FACTORIAL  shift, and go to state 45
+
+    $default  reduce using rule 10 (expr)
+
+
+state 34
+
+    4 expr: expr . '+' expr
+    4     | expr '+' expr .
+    5     | expr . '-' expr
+    6     | expr . '*' expr
+    7     | expr . '/' expr
+    8     | expr . '%' expr
+    9     | expr . '^' expr
+
+    '*'  shift, and go to state 23
+    '/'  shift, and go to state 24
+    '%'  shift, and go to state 25
+    '^'  shift, and go to state 26
+
+    $default  reduce using rule 4 (expr)
+
+
+state 35
+
+    4 expr: expr . '+' expr
+    5     | expr . '-' expr
+    5     | expr '-' expr .
+    6     | expr . '*' expr
+    7     | expr . '/' expr
+    8     | expr . '%' expr
+    9     | expr . '^' expr
+
+    '*'  shift, and go to state 23
+    '/'  shift, and go to state 24
+    '%'  shift, and go to state 25
+    '^'  shift, and go to state 26
+
+    $default  reduce using rule 5 (expr)
+
+
+state 36
+
+    4 expr: expr . '+' expr
+    5     | expr . '-' expr
+    6     | expr . '*' expr
+    6     | expr '*' expr .
+    7     | expr . '/' expr
+    8     | expr . '%' expr
+    9     | expr . '^' expr
+
+    '^'  shift, and go to state 26
+
+    $default  reduce using rule 6 (expr)
+
+
+state 37
+
+    4 expr: expr . '+' expr
+    5     | expr . '-' expr
+    6     | expr . '*' expr
+    7     | expr . '/' expr
+    7     | expr '/' expr .
+    8     | expr . '%' expr
+    9     | expr . '^' expr
+
+    '^'  shift, and go to state 26
+
+    $default  reduce using rule 7 (expr)
+
+
+state 38
+
+    4 expr: expr . '+' expr
+    5     | expr . '-' expr
+    6     | expr . '*' expr
+    7     | expr . '/' expr
+    8     | expr . '%' expr
+    8     | expr '%' expr .
+    9     | expr . '^' expr
+
+    '^'  shift, and go to state 26
+
+    $default  reduce using rule 8 (expr)
+
+
+state 39
+
+    4 expr: expr . '+' expr
+    5     | expr . '-' expr
+    6     | expr . '*' expr
+    7     | expr . '/' expr
+    8     | expr . '%' expr
+    9     | expr . '^' expr
+    9     | expr '^' expr .
+
+    '^'  shift, and go to state 26
+
+    $default  reduce using rule 9 (expr)
+
+
+state 40
+
+   12 expr: EXP '(' expr ')' .
+
+    $default  reduce using rule 12 (expr)
+
+
+state 41
+
+   11 expr: LOG '(' expr ')' .
+
+    $default  reduce using rule 11 (expr)
+
+
+state 42
+
+   13 expr: SQRT '(' expr ')' .
+
+    $default  reduce using rule 13 (expr)
+
+
+state 43
+
+   14 expr: MAX '(' expr ',' . expr ')'
+
+    EXP    shift, and go to state 4
+    LOG    shift, and go to state 5
+    SQRT   shift, and go to state 6
+    MAX    shift, and go to state 7
+    MIN    shift, and go to state 8
+    PI     shift, and go to state 9
+    INTC   shift, and go to state 10
+    REALC  shift, and go to state 11
+    '('    shift, and go to state 12
+
+    expr  go to state 46
+
+
+state 44
+
+   15 expr: MIN '(' expr ',' . expr ')'
+
+    EXP    shift, and go to state 4
+    LOG    shift, and go to state 5
+    SQRT   shift, and go to state 6
+    MAX    shift, and go to state 7
+    MIN    shift, and go to state 8
+    PI     shift, and go to state 9
+    INTC   shift, and go to state 10
+    REALC  shift, and go to state 11
+    '('    shift, and go to state 12
+
+    expr  go to state 47
+
+
+state 45
+
+   16 expr: '(' expr ')' FACTORIAL .
+
+    $default  reduce using rule 16 (expr)
+
+
+state 46
+
+    4 expr: expr . '+' expr
+    5     | expr . '-' expr
+    6     | expr . '*' expr
+    7     | expr . '/' expr
+    8     | expr . '%' expr
+    9     | expr . '^' expr
+   14     | MAX '(' expr ',' expr . ')'
+
+    '+'  shift, and go to state 21
+    '-'  shift, and go to state 22
+    '*'  shift, and go to state 23
+    '/'  shift, and go to state 24
+    '%'  shift, and go to state 25
+    '^'  shift, and go to state 26
+    ')'  shift, and go to state 48
+
+
+state 47
+
+    4 expr: expr . '+' expr
+    5     | expr . '-' expr
+    6     | expr . '*' expr
+    7     | expr . '/' expr
+    8     | expr . '%' expr
+    9     | expr . '^' expr
+   15     | MIN '(' expr ',' expr . ')'
+
+    '+'  shift, and go to state 21
+    '-'  shift, and go to state 22
+    '*'  shift, and go to state 23
+    '/'  shift, and go to state 24
+    '%'  shift, and go to state 25
+    '^'  shift, and go to state 26
+    ')'  shift, and go to state 49
+
+
+state 48
+
+   14 expr: MAX '(' expr ',' expr ')' .
+
+    $default  reduce using rule 14 (expr)
+
+
+state 49
+
+   15 expr: MIN '(' expr ',' expr ')' .
+
+    $default  reduce using rule 15 (expr)
